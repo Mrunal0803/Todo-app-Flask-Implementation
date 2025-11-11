@@ -7,3 +7,4 @@ itsdangerous==2.2.0
 Jinja2==3.1.4
 click==8.1.7
 python-dotenv==1.0.1
+standard-imghdr==3.13.0
