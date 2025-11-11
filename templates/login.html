@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<section class="auth-card">
+	<h1>Login</h1>
+	<form id="login-form" method="POST" action="{{ url_for('login') }}" novalidate>
+		<div class="form-row">
+			<label for="user_id">User ID</label>
+			<input type="text" id="user_id" name="user_id" required />
+		</div>
+		<div class="form-row password-field">
+			<label for="password">Password</label>
+			<div class="password-input-wrapper">
+				<input type="password" id="password" name="password" required />
+				<button type="button" class="btn password-toggle" data-target="password">
+					<span class="eye-icon">👁️</span>
+				</button>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn primary">Login</button>
+			<a class="btn link" href="{{ url_for('forgot_password') }}">Forgot password?</a>
+			<a class="btn link" href="{{ url_for('signup') }}">Create account</a>
+		</div>
+	</form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+	document.getElementById('login-form').addEventListener('submit', function (e) {
+		const userId = document.getElementById('user_id').value.trim();
+		const password = document.getElementById('password').value;
+		if (!userId || !password) {
+			e.preventDefault();
+			alert('User ID and Password are required.');
+		}
+	});
+
+	// Password visibility toggle
+	document.querySelector('.password-toggle').addEventListener('click', function() {
+		const targetId = this.dataset.target;
+		const input = document.getElementById(targetId);
+		const type = input.type === 'password' ? 'text' : 'password';
+		input.type = type;
+		this.querySelector('.eye-icon').textContent = type === 'password' ? '👁️' : '🔒';
+	});
+
+	// If there is a success flash (e.g. after password change), show modal popup
+	(function () {
+		const flashes = document.querySelectorAll('#flash-messages .flash.success');
+		if (flashes.length > 0 && window.showPopup) {
+			const text = Array.from(flashes).map(x => x.textContent.trim()).join('\n');
+			window.showPopup(text);
+		}
+	})();
+</script>
+{% endblock %}

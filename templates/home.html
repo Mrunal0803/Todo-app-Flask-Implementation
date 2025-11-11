@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Welcome · ToDo{% endblock %}
+{% block content %}
+<section class="hero">
+	<div class="hero-inner">
+		<h1 class="hero-title">Organize your day with style</h1>
+		<p class="hero-sub">Fast, friendly, and secure To‑Do lists with a modern interface.</p>
+		<div class="hero-ctas">
+			<a class="btn primary" href="{{ url_for('signup') }}">Get Started</a>
+			<a class="btn" href="{{ url_for('login') }}">Login</a>
+		</div>
+	</div>
+	<div class="hero-art">
+		<div class="blob one"></div>
+		<div class="blob two"></div>
+		<div class="blob three"></div>
+	</div>
+</section>
+
+<section class="features container">
+	<div class="features-grid">
+		<div class="feat-card">
+			<div class="feat-icon">
+				<img src="{{ url_for('static', filename='images/feat-simple.png') }}" alt="Simple & Powerful" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+				<div class="feat-icon-fallback" style="display: none;">⚡</div>
+			</div>
+			<h3>Simple & Powerful</h3>
+			<p>Create, edit, complete, and delete tasks with ease.</p>
+		</div>
+		<div class="feat-card">
+			<div class="feat-icon">
+				<img src="{{ url_for('static', filename='images/feat-private.png') }}" alt="Private by Default" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+				<div class="feat-icon-fallback" style="display: none;">🔒</div>
+			</div>
+			<h3>Private by Default</h3>
+			<p>Your tasks are tied to your account and stored securely.</p>
+		</div>
+		<div class="feat-card">
+			<div class="feat-icon">
+				<img src="{{ url_for('static', filename='images/feat-responsive.png') }}" alt="Responsive & Beautiful" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+				<div class="feat-icon-fallback" style="display: none;">📱</div>
+			</div>
+			<h3>Responsive & Beautiful</h3>
+			<p>Looks great on phones, tablets, and desktops.</p>
+		</div>
+		<div class="feat-card">
+			<div class="feat-icon">
+				<img src="{{ url_for('static', filename='images/feat-profile.png') }}" alt="Profile & Avatars" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+				<div class="feat-icon-fallback" style="display: none;">👤</div>
+			</div>
+			<h3>Profile & Avatars</h3>
+			<p>Customize your profile, email, password, and avatar.</p>
+		</div>
+	</div>
+</section>
+
+<section class="cta container">
+	<div class="card">
+		<h2>Ready to get things done?</h2>
+		<p class="muted">Join now and start tracking your tasks in seconds.</p>
+		<div class="form-actions">
+			<a class="btn primary" href="{{ url_for('signup') }}">Create free account</a>
+			<a class="btn" href="{{ url_for('login') }}">I already have an account</a>
+		</div>
+	</div>
+</section>
+{% endblock %}

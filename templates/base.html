@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<title>{% block title %}Flask ToDo{% endblock %}</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+	<header class="site-header">
+		<div class="container flex between center">
+			<a href="{{ url_for('index') }}" class="brand">ToDo</a>
+			<div class="nav-wrap">
+				<button id="nav-toggle" aria-label="Menu" title="Menu">☰</button>
+				<nav>
+					<ul class="nav">
+						<li><a href="{{ url_for('index') }}">Home</a></li>
+						{% if current_user.is_authenticated %}
+						<li><a href="{{ url_for('todos') }}">My Todos</a></li>
+						<li><a href="{{ url_for('profile') }}">Profile</a></li>
+						<li>
+							{% if current_user.avatar_data %}
+								<img class="avatar-sm" src="{{ url_for('get_avatar', user_id=current_user.id) }}" alt="Avatar" />
+							{% else %}
+								<span class="avatar-sm placeholder">{{ current_user.name[0]|upper }}</span>
+							{% endif %}
+						</li>
+						<li><a href="{{ url_for('logout') }}">Logout</a></li>
+						{% else %}
+						<li><a href="{{ url_for('login') }}">Login</a></li>
+						<li><a href="{{ url_for('signup') }}">Sign up</a></li>
+						{% endif %}
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</header>
+
+	<main class="container">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				<div id="flash-messages">
+					{% for category, message in messages %}
+					<div class="flash {{ category }}">{{ message }}</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endwith %}
+
+		{% block content %}{% endblock %}
+	</main>
+
+	<div id="popup" class="popup hidden">
+		<div class="popup-content">
+			<p id="popup-text"></p>
+			<button id="popup-close" type="button">OK</button>
+		</div>
+	</div>
+
+	<div id="session-timeout" class="popup hidden">
+		<div class="popup-content">
+			<p>Your session will expire in <span id="timeout-counter">60</span> seconds.</p>
+			<div class="form-actions">
+				<button id="extend-session" class="btn primary">Stay Logged In</button>
+				<button id="logout-now" class="btn">Logout Now</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="{{ url_for('static', filename='app.js') }}"></script>
+	<script src="{{ url_for('static', filename='cache-control.js') }}"></script>
+	{% if current_user.is_authenticated %}
+	<script>
+		// Session timeout handling
+		const SESSION_TIMEOUT = {{ config.PERMANENT_SESSION_LIFETIME }}; // Add semicolon to terminate statement
+		const WARNING_TIME = 60; // Show warning 60 seconds before timeout
+		
+		let timeoutWarning;
+		let countdownInterval;
+		
+		function showTimeoutWarning() {
+			const sessionTimeout = document.getElementById('session-timeout');
+			const counter = document.getElementById('timeout-counter');
+			sessionTimeout.classList.remove('hidden');
+			
+			let secondsLeft = WARNING_TIME;
+			counter.textContent = secondsLeft;
+			
+			countdownInterval = setInterval(() => {
+				secondsLeft--;
+				counter.textContent = secondsLeft;
+				if (secondsLeft <= 0) {
+					window.location.href = "{{ url_for('logout') }}";
+				}
+			}, 1000);
+		}
+		
+		function resetSessionTimer() {
+			clearTimeout(timeoutWarning);
+			clearInterval(countdownInterval);
+			const sessionTimeout = document.getElementById('session-timeout');
+			sessionTimeout.classList.add('hidden');
+			
+			timeoutWarning = setTimeout(showTimeoutWarning, (SESSION_TIMEOUT - WARNING_TIME) * 1000);
+		}
+		
+		// Initialize session timer
+		resetSessionTimer();
+		
+		// Reset timer on user activity
+		document.addEventListener('click', resetSessionTimer);
+		document.addEventListener('keypress', resetSessionTimer);
+		document.addEventListener('scroll', resetSessionTimer);
+		
+		// Extend session button
+		document.getElementById('extend-session').addEventListener('click', function() {
+			fetch("{{ url_for('index') }}").then(() => resetSessionTimer());
+		});
+		
+		// Logout now button
+		document.getElementById('logout-now').addEventListener('click', function() {
+			window.location.href = "{{ url_for('logout') }}";
+		});
+	</script>
+	{% endif %}
+	{% block scripts %}{% endblock %}
+</body>
+</html>

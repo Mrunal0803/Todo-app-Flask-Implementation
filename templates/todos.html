@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}My Todos{% endblock %}
+{% block content %}
+<section class="todos">
+	<h1>Hello, {{ current_user.name }}!</h1>
+	<form class="card" method="POST" action="{{ url_for('create_todo') }}" id="create-form">
+		<h2>Add a new todo</h2>
+		<div class="form-row">
+			<label for="title">Title</label>
+			<input type="text" id="title" name="title" placeholder="e.g., Buy groceries" required />
+		</div>
+		<div class="form-row">
+			<label for="description">Description (optional)</label>
+			<textarea id="description" name="description" rows="3" placeholder="Add details..."></textarea>
+		</div>
+		<div class="form-actions">
+			<button class="btn primary" type="submit">Add</button>
+		</div>
+	</form>
+
+	<div class="list">
+		{% if items %}
+			<ul class="todo-list">
+				{% for todo in items %}
+				<li class="todo-item {% if todo.is_completed %}done{% endif %}" data-id="{{ todo.id }}">
+					<form class="inline" method="POST" action="{{ url_for('toggle_todo', todo_id=todo.id) }}">
+						<button type="submit" class="icon-btn" title="Toggle complete" data-ajax="true">✓</button>
+					</form>
+					<form class="edit-form" method="POST" action="{{ url_for('update_todo', todo_id=todo.id) }}">
+						<input type="text" name="title" value="{{ todo.title }}" required />
+						<input type="text" name="description" value="{{ todo.description or '' }}" placeholder="Description" />
+						<button class="btn" type="submit">Save</button>
+					</form>
+					<form class="inline" method="POST" action="{{ url_for('delete_todo', todo_id=todo.id) }}">
+						<button type="submit" class="icon-btn danger" title="Delete" data-ajax="true">✕</button>
+					</form>
+				</li>
+				{% endfor %}
+			</ul>
+		{% else %}
+			<p class="muted">No todos yet. Add your first above!</p>
+		{% endif %}
+	</div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+	document.getElementById('create-form').addEventListener('submit', function (e) {
+		const title = document.getElementById('title').value.trim();
+		if (!title) {
+			e.preventDefault();
+			alert('Title is required.');
+		}
+	});
+</script>
+{% endblock %}

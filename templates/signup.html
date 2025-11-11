@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+<section class="auth-card">
+	<h1>Create your account</h1>
+	<form id="signup-form" method="POST" action="{{ url_for('signup') }}" novalidate>
+		<div class="form-row">
+			<label for="user_id">User ID</label>
+			<input type="text" id="user_id" name="user_id" required minlength="3" maxlength="64" />
+		</div>
+		<div class="form-row">
+			<label for="name">Name</label>
+			<input type="text" id="name" name="name" required />
+		</div>
+		<div class="form-row">
+			<label for="email">Email</label>
+			<input type="email" id="email" name="email" required />
+		</div>
+		<div class="form-row">
+			<label for="phone">Phone Number</label>
+			<input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" placeholder="Enter 10-digit number" />
+		</div>
+		<div class="form-row">
+			<label for="address">Address</label>
+			<textarea id="address" name="address" required rows="3"></textarea>
+		</div>
+		<div class="form-row password-field">
+			<label for="password">Password</label>
+			<div class="password-input-wrapper">
+				<input type="password" id="password" name="password" required minlength="6" />
+				<button type="button" class="btn password-toggle" data-target="password">
+					<span class="eye-icon">👁️</span>
+				</button>
+			</div>
+		</div>
+		<div class="form-row password-field">
+			<label for="confirm_password">Retype Password</label>
+			<div class="password-input-wrapper">
+				<input type="password" id="confirm_password" name="confirm_password" required minlength="6" />
+				<button type="button" class="btn password-toggle" data-target="confirm_password">
+					<span class="eye-icon">👁️</span>
+				</button>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn primary">Sign up</button>
+			<a class="btn link" href="{{ url_for('login') }}">Have an account? Log in</a>
+		</div>
+	</form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+	document.getElementById('signup-form').addEventListener('submit', function (e) {
+		const userId = document.getElementById('user_id').value.trim();
+		const name = document.getElementById('name').value.trim();
+		const email = document.getElementById('email').value.trim();
+		const phone = document.getElementById('phone').value.trim();
+		const address = document.getElementById('address').value.trim();
+		const password = document.getElementById('password').value;
+		const confirm = document.getElementById('confirm_password').value;
+
+		if (!userId || !name || !email || !phone || !address || !password || !confirm) {
+			e.preventDefault();
+			alert('Please fill out all fields.');
+			return;
+		}
+		if (!/^\d{10}$/.test(phone)) {
+			e.preventDefault();
+			alert('Please enter a valid 10-digit phone number.');
+			return;
+		}
+		if (password.length < 6) {
+			e.preventDefault();
+			alert('Password must be at least 6 characters.');
+			return;
+		}
+		if (password !== confirm) {
+			e.preventDefault();
+			alert('Passwords do not match.');
+		}
+	});
+
+	// Password visibility toggle
+	document.querySelectorAll('.password-toggle').forEach(button => {
+		button.addEventListener('click', function() {
+			const targetId = this.dataset.target;
+			const input = document.getElementById(targetId);
+			const type = input.type === 'password' ? 'text' : 'password';
+			input.type = type;
+			this.querySelector('.eye-icon').textContent = type === 'password' ? '👁️' : '🔒';
+		});
+	});
+
+	// Show success popup if there is a success flash from server
+	(function () {
+		const flashes = document.querySelectorAll('#flash-messages .flash.success');
+		if (flashes.length > 0) {
+			const text = Array.from(flashes).map(x => x.textContent.trim()).join('\n');
+			window.showPopup(text);
+		}
+	})();
+</script>
+{% endblock %}
